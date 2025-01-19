@@ -1,3 +1,4 @@
+/* using JSX */
 /* import Императивный стиль */
 
 import { useState } from 'react';
