@@ -1,77 +1,94 @@
-/* don't use JSX */
-import React from 'react';
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { CurrentYear } from './assets/currentYear';
+import styles from './app.module.css';
+import data from './data.json';
 
 export const App = () => {
-	const [count, setCount] = useState(0);
-	return /*#__PURE__*/ React.createElement(
-		React.Fragment,
-		null,
-		/*#__PURE__*/ React.createElement(
-			'div',
-			null,
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://vite.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: viteLogo,
-					className: 'logo',
-					alt: 'Vite logo',
-				}),
-			),
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://react.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: reactLogo,
-					className: 'logo react',
-					alt: 'React logo',
-				}),
-			),
-		),
-		/*#__PURE__*/ React.createElement('h1', null, 'Vite + React'),
-		/*#__PURE__*/ React.createElement(
-			'div',
-			{
-				className: 'card',
-			},
-			/*#__PURE__*/ React.createElement(
-				'button',
-				{
-					onClick: () => setCount((count) => count + 1),
-				},
-				'count is ',
-				count,
-			),
-			/*#__PURE__*/ React.createElement(
-				'p',
-				null,
-				'Edit ',
-				/*#__PURE__*/ React.createElement('code', null, 'src/App.jsx'),
-				' and save to test HMR',
-			),
-		),
-		/*#__PURE__*/ React.createElement(
-			'p',
-			{
-				className: 'read-the-docs',
-			},
-			'Click on the Vite and React logos to learn more',
-		),
-		/*#__PURE__*/ React.createElement(
-			'footer',
-			null,
-			/*#__PURE__*/ React.createElement(CurrentYear, null),
-		),
+	// Храним массив шагов из data.json (он неизменяемый)
+	const [steps] = useState(data);
+
+	// Храним текущий активный индекс шага (по умолчанию 0 - первый шаг)
+	const [activeIndex, setActiveIndex] = useState(0);
+
+	// Флаг: проверяем, находимся ли мы на первом шаге
+	const isFirstStep = activeIndex === 0;
+
+	// Флаг: проверяем, находимся ли мы на последнем шаге
+	const isLastStep = activeIndex === steps.length - 1;
+
+	// Функция для перехода к следующему шагу
+	const nextStep = () => {
+		// Если это последний шаг, переходим к первому (начинаем сначала)
+		// Иначе просто увеличиваем activeIndex
+		setActiveIndex((prevIndex) => (isLastStep ? 0 : prevIndex + 1));
+	};
+
+	// Функция для перехода к предыдущему шагу
+	const prevStep = () => {
+		// Назад можно идти только если это не первый шаг
+		if (!isFirstStep) {
+			setActiveIndex((prevIndex) => prevIndex - 1);
+		}
+	};
+
+	// Функция для перехода к конкретному шагу по индексу
+	const goToStep = (index) => {
+		setActiveIndex(index);
+	};
+
+	return (
+		<div className={styles.container}>
+			<div className={styles.card}>
+				<h1>Инструкция по готовке пельменей</h1>
+
+				{/* Контент активного шага */}
+				<div className={styles.steps}>
+					<div className={styles['steps-content']}>
+						{steps[activeIndex].content}
+					</div>
+
+					{/* Список шагов с кнопками */}
+					<ul className={styles['steps-list']}>
+						{steps.map((step, index) => (
+							<li
+								key={step.id}
+								// Добавляем классы:
+								// - done (если шаг пройден или активен)
+								// - active (если шаг текущий)
+								className={`${styles['steps-item']} 
+                    ${index <= activeIndex ? styles.done : ''} 
+                    ${index === activeIndex ? styles.active : ''}`}
+							>
+								{/* Кнопка для перехода к шагу по индексу */}
+								<button
+									className={styles['steps-item-button']}
+									onClick={() => goToStep(index)}
+								>
+									{index + 1}
+								</button>
+								{/* Название шага */}
+								{step.title}
+							</li>
+						))}
+					</ul>
+
+					{/* Контейнер с кнопками управления */}
+					<div className={styles['buttons-container']}>
+						{/* Кнопка "Назад" (блокируется на первом шаге) */}
+						<button
+							className={styles.button}
+							onClick={prevStep}
+							disabled={isFirstStep}
+						>
+							Назад
+						</button>
+
+						{/* Кнопка "Далее" (или "Начать сначала" на последнем шаге) */}
+						<button className={styles.button} onClick={nextStep}>
+							{isLastStep ? 'Начать сначала' : 'Далее'}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 };
