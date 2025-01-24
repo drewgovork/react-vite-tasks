@@ -1,77 +1,95 @@
-/* don't use JSX */
-import React from 'react';
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { CurrentYear } from './assets/currentYear';
+import styles from './App.module.css';
 
 export const App = () => {
-	const [count, setCount] = useState(0);
-	return /*#__PURE__*/ React.createElement(
-		React.Fragment,
-		null,
-		/*#__PURE__*/ React.createElement(
-			'div',
-			null,
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://vite.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: viteLogo,
-					className: 'logo',
-					alt: 'Vite logo',
-				}),
-			),
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://react.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: reactLogo,
-					className: 'logo react',
-					alt: 'React logo',
-				}),
-			),
-		),
-		/*#__PURE__*/ React.createElement('h1', null, 'Vite + React'),
-		/*#__PURE__*/ React.createElement(
-			'div',
-			{
-				className: 'card',
-			},
-			/*#__PURE__*/ React.createElement(
-				'button',
-				{
-					onClick: () => setCount((count) => count + 1),
-				},
-				'count is ',
-				count,
-			),
-			/*#__PURE__*/ React.createElement(
-				'p',
-				null,
-				'Edit ',
-				/*#__PURE__*/ React.createElement('code', null, 'src/App.jsx'),
-				' and save to test HMR',
-			),
-		),
-		/*#__PURE__*/ React.createElement(
-			'p',
-			{
-				className: 'read-the-docs',
-			},
-			'Click on the Vite and React logos to learn more',
-		),
-		/*#__PURE__*/ React.createElement(
-			'footer',
-			null,
-			/*#__PURE__*/ React.createElement(CurrentYear, null),
-		),
+	const [operand1, setOperand1] = useState('');
+	const [operator, setOperator] = useState('');
+	const [operand2, setOperand2] = useState('');
+	const [result, setResult] = useState(null);
+
+	const NUMS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+	// Ввод чисел
+	const handleNumberClick = (num) => {
+		if (result !== null) {
+			// Если уже есть результат — начинаем заново
+			setOperand1(num);
+			setOperator('');
+			setOperand2('');
+			setResult(null);
+		} else if (!operator) {
+			setOperand1((prev) => prev + num);
+		} else {
+			setOperand2((prev) => prev + num);
+		}
+	};
+
+	// Ввод оператора
+	const handleOperatorClick = (op) => {
+		if (operand1 && !operator) {
+			setOperator(op);
+		}
+	};
+
+	// Вычисление
+	const handleEqualClick = () => {
+		if (operand1 && operator && operand2) {
+			const num1 = parseInt(operand1, 10);
+			const num2 = parseInt(operand2, 10);
+			const res = operator === '+' ? num1 + num2 : num1 - num2;
+			setResult(res);
+		}
+	};
+
+	// Сброс
+	const handleClearClick = () => {
+		setOperand1('');
+		setOperator('');
+		setOperand2('');
+		setResult(null);
+	};
+
+	return (
+		<div className={styles.calculator}>
+			{/* Дисплей */}
+			<div className={`${styles.display} ${result !== null ? styles.result : ''}`}>
+				{result !== null ? result : `${operand1} ${operator} ${operand2}`}
+			</div>
+
+			{/* Кнопки цифр */}
+			<div className={styles.buttons}>
+				{NUMS.map((num) => (
+					<button
+						key={num}
+						className={styles.button}
+						onClick={() => handleNumberClick(num)}
+					>
+						{num}
+					</button>
+				))}
+			</div>
+
+			{/* Кнопки операций */}
+			<div className={styles.controls}>
+				<button className={styles.clear} onClick={handleClearClick}>
+					C
+				</button>
+				<button
+					className={styles.operator}
+					onClick={() => handleOperatorClick('+')}
+				>
+					+
+				</button>
+				<button
+					className={styles.operator}
+					onClick={() => handleOperatorClick('-')}
+				>
+					-
+				</button>
+				<button className={styles.equal} onClick={handleEqualClick}>
+					=
+				</button>
+			</div>
+		</div>
 	);
 };
