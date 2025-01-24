@@ -1,77 +1,74 @@
-/* don't use JSX */
-import React from 'react';
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { CurrentYear } from './assets/currentYear';
+import styles from './App.module.css';
 
 export const App = () => {
-	const [count, setCount] = useState(0);
-	return /*#__PURE__*/ React.createElement(
-		React.Fragment,
-		null,
-		/*#__PURE__*/ React.createElement(
-			'div',
-			null,
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://vite.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: viteLogo,
-					className: 'logo',
-					alt: 'Vite logo',
-				}),
-			),
-			/*#__PURE__*/ React.createElement(
-				'a',
-				{
-					href: 'https://react.dev',
-					target: '_blank',
-				},
-				/*#__PURE__*/ React.createElement('img', {
-					src: reactLogo,
-					className: 'logo react',
-					alt: 'React logo',
-				}),
-			),
-		),
-		/*#__PURE__*/ React.createElement('h1', null, 'Vite + React'),
-		/*#__PURE__*/ React.createElement(
-			'div',
-			{
-				className: 'card',
-			},
-			/*#__PURE__*/ React.createElement(
-				'button',
-				{
-					onClick: () => setCount((count) => count + 1),
-				},
-				'count is ',
-				count,
-			),
-			/*#__PURE__*/ React.createElement(
-				'p',
-				null,
-				'Edit ',
-				/*#__PURE__*/ React.createElement('code', null, 'src/App.jsx'),
-				' and save to test HMR',
-			),
-		),
-		/*#__PURE__*/ React.createElement(
-			'p',
-			{
-				className: 'read-the-docs',
-			},
-			'Click on the Vite and React logos to learn more',
-		),
-		/*#__PURE__*/ React.createElement(
-			'footer',
-			null,
-			/*#__PURE__*/ React.createElement(CurrentYear, null),
-		),
+	const [value, setValue] = useState('');
+	const [list, setList] = useState([]);
+	const [error, setError] = useState('');
+	const isValueValid = value.length >= 3;
+
+	const onInputButtonClick = () => {
+		const promptValue = prompt('Введите значение:');
+
+		if (!promptValue || promptValue.trim().length < 3) {
+			setError('Введенное значение должно содержать минимум 3 символа');
+			return;
+		}
+
+		setValue(promptValue.trim());
+		setError('');
+	};
+
+	const onAddButtonClick = () => {
+		if (!isValueValid) return;
+
+		const newItem = {
+			id: Date.now(),
+			value: value,
+			date: new Date().toLocaleString(),
+		};
+
+		setList([...list, newItem]);
+		setValue('');
+		setError('');
+	};
+
+	return (
+		<>
+			<div className={styles.app}>
+				<h1 className={styles.pageHeading}>Ввод значения</h1>
+				<p className={styles.noMarginText}>
+					Текущее значение:
+					<output className={styles.currentValue}>{value}</output>
+				</p>
+				<div className={styles.error}>{error && <p>{error}</p>}</div>
+				<div className={styles.buttonsContainer}>
+					<button className={styles.button} onClick={onInputButtonClick}>
+						Ввести новое
+					</button>
+					<button
+						className={styles.button}
+						disabled={!isValueValid}
+						onClick={onAddButtonClick}
+					>
+						Добавить в список
+					</button>
+				</div>
+				<div className={styles.listContainer}>
+					<h2 className={styles.listHeading}>Список:</h2>
+					{list.length === 0 ? (
+						<p className={styles.noMarginText}>Нет добавленных элементов</p>
+					) : (
+						<ul className={styles.list}>
+							{list.map((item) => (
+								<li key={item.id} className={styles.listItem}>
+									{item.date} — <b>{item.value}</b>
+								</li>
+							))}
+						</ul>
+					)}
+				</div>
+			</div>
+		</>
 	);
 };
