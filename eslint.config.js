@@ -6,6 +6,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   { ignores: ['dist'] },
+	{
+		extends: ['eslint:recommended', 'plugin:react/recommended'],
+	},
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
